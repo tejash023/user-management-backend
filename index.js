@@ -3,7 +3,7 @@ const app = express();
 const port = process.env.PORT || '8080';
 const db = require('./config/database');
 
-
+app.use(express.urlencoded({extended: false}));
 //routes
 app.use('/', require('./routes'));
 
