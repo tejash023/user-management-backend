@@ -1,7 +1,10 @@
 //importing user
 const User = require('../models/user');
+// const JwtStrategy = require('passport-jwt/lib/strategy');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const encryption = require('../config/encryption');
-const JwtStrategy = require('passport-jwt/lib/strategy');
+
 
 //register the user
 module.exports.registerUser = async (req, res) => {
@@ -23,16 +26,17 @@ module.exports.registerUser = async (req, res) => {
       //encryping the req.body before storing it into the database
       const encryptedUser = {
         name: encryption.encryptData(req.body.name),
-        email: encryption.encryptData(req.body.email),
+        email: await req.body.email,
         phone: encryption.encryptData(req.body.phone),
-        password: encryption.encryptData(req.body.password),
+        password: await bcrypt.hash(req.body.password, 10),
       }
-      //console.log(encryptedUser);
+  
       await User.create(encryptedUser);
       return res.status(200).json({
         message: 'User registered successfully'
       });
     }else{
+      //if user exists
       return res.status(422).json({
         message: 'email already exists'
       });
@@ -83,28 +87,37 @@ module.exports.getAllUsers = async (req, res) => {
   
 }
 
-//login user
-module.exports.createSession = (req, res) => {
+//user login
+module.exports.createSession = async (req, res) => {
 
   try{
 
     //find user using email - if user exists
-    let user = await User.findOne({email: encryption.encryptData(req.body.email)});
+    
+    let user = await User.findOne({ email: req.body.email});
+    
 
-    //if user doesnot exists / passwords does not match
-    if(!user || user.password !== encryption.encryptData(req.body.password)){
+    //if user doesnot exists
+    if(!user){
       return res.status(422).json({
-        message:'Invalid username or password'
+        message:'User doesnot exists'
       })
     }
 
-    //if user exists and password match - login and generate jwt token
-    return res.status(200).json({
-      message:'Sign in successfull',
-      data:{
-        token: jwt.sign(doctor.toJSON(), '', {expiresIn: '500000'})
-      }
-    });
+    //check if password is valid
+    if(bcrypt.compare(req.body.password, user.password)){
+      return res.status(200).json({
+        message:'Sign in successfull',
+        data:{
+          token: jwt.sign(user.toJSON(), 'faj42hrj2fejoihe2i3', {expiresIn: '500000'})
+        }
+      });
+    //return if invalid purpose
+    }else{
+      return res.status(422).json({
+        message:'Incorrect username/password'
+      })
+    }
 
   }catch(err){
     console.log(err.message);
@@ -112,4 +125,10 @@ module.exports.createSession = (req, res) => {
       message:'Internal server error'
     });
   }
+}
+
+module.exports.create = (req, res) => {
+  return res.status(200).json({
+    message: 'Router'
+  })
 }

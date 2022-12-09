@@ -11,5 +11,9 @@ router.get('/get', userController.getAllUsers);
 
 //login user
 
+router.post('/login', userController.createSession);
+
+router.get('/hello', userController.create);
+
 //update user
 module.exports = router;
