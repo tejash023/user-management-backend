@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const port = process.env.PORT || '8080';
 const db = require('./config/database');
+const passport = require('passport');
+const passportJWT = require('./config/passport-jwt-strategy');
 
 app.use(express.urlencoded({extended: false}));
 //routes

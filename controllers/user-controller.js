@@ -1,6 +1,7 @@
 //importing user
 const User = require('../models/user');
 const encryption = require('../config/encryption');
+const JwtStrategy = require('passport-jwt/lib/strategy');
 
 //register the user
 module.exports.registerUser = async (req, res) => {
@@ -80,4 +81,35 @@ module.exports.getAllUsers = async (req, res) => {
     }
   }
   
+}
+
+//login user
+module.exports.createSession = (req, res) => {
+
+  try{
+
+    //find user using email - if user exists
+    let user = await User.findOne({email: encryption.encryptData(req.body.email)});
+
+    //if user doesnot exists / passwords does not match
+    if(!user || user.password !== encryption.encryptData(req.body.password)){
+      return res.status(422).json({
+        message:'Invalid username or password'
+      })
+    }
+
+    //if user exists and password match - login and generate jwt token
+    return res.status(200).json({
+      message:'Sign in successfull',
+      data:{
+        token: jwt.sign(doctor.toJSON(), '', {expiresIn: '500000'})
+      }
+    });
+
+  }catch(err){
+    console.log(err.message);
+    return res.status(500).json({
+      message:'Internal server error'
+    });
+  }
 }
