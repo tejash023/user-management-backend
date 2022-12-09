@@ -9,6 +9,9 @@ const encryption = require('../config/encryption');
 //register the user
 module.exports.registerUser = async (req, res) => {
 
+  //accepts userName, userEmail, userPhone, password and confirm password.
+  //passowrd is stored in hashed format
+
   try{
 
     //validate if password and confirm password matches
@@ -23,7 +26,7 @@ module.exports.registerUser = async (req, res) => {
 
     //if user does not exist - create the user else redirect back to register page
     if(!user){
-      //encryping the req.body before storing it into the database
+      //encryping the user details before storing it into the database
       const encryptedUser = {
         name: encryption.encryptData(req.body.name),
         email: await req.body.email,
@@ -90,6 +93,8 @@ module.exports.getAllUsers = async (req, res) => {
 //user login
 module.exports.createSession = async (req, res) => {
 
+  //accepts user email and password - upon login will generate a json web token valid for 5 mins
+
   try{
 
     //find user using email - if user exists
@@ -100,12 +105,13 @@ module.exports.createSession = async (req, res) => {
     //if user doesnot exists
     if(!user){
       return res.status(422).json({
-        message:'User doesnot exists'
+        message:'User does not exists'
       })
     }
 
     //check if password is valid
-    if(bcrypt.compare(req.body.password, user.password)){
+    //console.log(await bcrypt.compare(req.body.password, user.password));
+    if(await bcrypt.compare(req.body.password, user.password)){
       return res.status(200).json({
         message:'Sign in successfull',
         data:{
@@ -115,7 +121,7 @@ module.exports.createSession = async (req, res) => {
     //return if invalid purpose
     }else{
       return res.status(422).json({
-        message:'Incorrect username/password'
+        message:'Incorrect username / password'
       })
     }
 
@@ -131,4 +137,48 @@ module.exports.create = (req, res) => {
   return res.status(200).json({
     message: 'Router'
   })
+}
+
+
+//reset password
+module.exports.resetPassword = async (req, res) => {
+  
+  //accepts email, old password, new password and confirm password
+  try{
+    if(req.body.new_password == req.body.confirm_password){
+
+      //find user by email
+      let user = await User.findOne({email: req.user.email});
+
+      //check if password is valid
+      if(await bcrypt.compare(req.body.password, user.password)){
+        User.changePassword(user, bcrypt.hash(req.body.new_password, 10));
+        return res.status(200).json({
+          message:'Password updated successfully',
+        });
+      //return if invalid purpose
+      }else{
+        return res.status(422).json({
+          message:'Incorrect email/password'
+        })
+      }
+
+    }else{
+      return res.status(422).json({
+        message: 'new and confirm password doesn\'t match'
+      })
+    }
+    
+
+
+
+  }catch(err){
+    console.log(err.message);
+    return res.status(422).json({
+      message:'Internal server error'
+    })
+
+  }
+
+
 }

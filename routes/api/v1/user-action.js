@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const passport = require('passport');
 
 const userController = require('../../../controllers/user-controller');
 
@@ -13,7 +14,7 @@ router.get('/get', userController.getAllUsers);
 
 router.post('/login', userController.createSession);
 
-router.get('/hello', userController.create);
+router.post('/reset-password', passport.authenticate('jwt', {session:false}),userController.resetPassword);
 
 //update user
 module.exports = router;
