@@ -4,7 +4,7 @@ info:
   contact: {}
   version: '1.0'
 servers:
-- url: https://user-management.up.railway.app/api/v1
+- url: https://user-management.up.railway.app/api/v1/user
   variables: {}
 paths:
   /register:
@@ -173,7 +173,6 @@ components:
       scheme: bearer
 security: []
 tags:
-
 - name: Auth
   description: ''
 - name: User
