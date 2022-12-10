@@ -1,7 +1,21 @@
 openapi: 3.0.0
 info:
   title: User Management
-  contact: {}
+  description: |-
+    A Server-side API built on NodeJS and MongoDB for User Management.
+
+    Features of the APP
+    - Registration of users
+    - Login 
+    - Reset Password
+    - Update user details
+    - Display list of all users
+    - All the users details are stored in database with encryption
+
+    [Github](https://github.com/tejash023/hospital-api) 
+  contact: 
+    email: tejash34961@gmail.com
+  
   version: '1.0'
 servers:
 - url: https://user-management.up.railway.app/api/v1/user
