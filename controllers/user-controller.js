@@ -66,9 +66,8 @@ module.exports.getAllUsers = async (req, res) => {
       //console.log('user', users[i].name);
       const user = {
         name: encryption.decryptData(users[i].name),
-        email: encryption.decryptData(users[i].email),
-        phone: encryption.decryptData(users[i].phone),
-        password: encryption.decryptData(users[i].password)
+        email: users[i].email,
+        phone: encryption.decryptData(users[i].phone)
       }
 
       decryptedUser.push(user);
@@ -133,12 +132,6 @@ module.exports.createSession = async (req, res) => {
   }
 }
 
-module.exports.create = (req, res) => {
-  return res.status(200).json({
-    message: 'Router'
-  })
-}
-
 
 //reset password
 module.exports.resetPassword = async (req, res) => {
@@ -147,21 +140,19 @@ module.exports.resetPassword = async (req, res) => {
   try{
     if(req.body.new_password == req.body.confirm_password){
 
-      //find user by email
-      let user = await User.findOne({email: req.user.email});
-
       //check if password is valid
-      if(await bcrypt.compare(req.body.password, user.password)){
+      if(await bcrypt.compare(req.body.password, req.user.password)){
         const hash = await bcrypt.hash(req.body.new_password, 10);
         await User.updateOne(
-          { _id: user._id },
+          { _id: req.user._id },
           { $set: { password: hash } },
           { new: true }
         );
         return res.status(200).json({
           message:'Password updated successfully',
         });
-      //return if invalid purpose
+
+      //return if invalid password
       }else{
         return res.status(422).json({
           message:'Incorrect email/password'
@@ -182,4 +173,35 @@ module.exports.resetPassword = async (req, res) => {
   }
 
 
+}
+
+
+//update user details
+module.exports.updateUser = async (req, res) => {
+
+  //accepts user name and user phone no and updates them.
+
+  if(req.user){
+    try{
+
+      let user = await User.findOne({email: req.user.email});
+
+      user.name = encryption.encryptData(req.body.name);
+      user.phone = encryption.encryptData(req.body.phone);
+
+      user.save();
+
+      return res.status(200).json({
+        message: 'User details updated successfully'
+      })
+
+
+    }catch(err){
+      console.log('Error:', err.message);
+      return res.status(422).json({
+        message: 'Internal Server Error'
+      })
+    }
+  }
+  
 }

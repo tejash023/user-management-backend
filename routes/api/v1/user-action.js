@@ -17,4 +17,6 @@ router.post('/login', userController.createSession);
 router.post('/reset-password', passport.authenticate('jwt', {session:false}),userController.resetPassword);
 
 //update user
+router.post('/update-user', passport.authenticate('jwt', {session: false}), userController.updateUser);
+
 module.exports = router;
