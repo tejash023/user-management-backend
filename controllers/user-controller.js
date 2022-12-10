@@ -152,7 +152,12 @@ module.exports.resetPassword = async (req, res) => {
 
       //check if password is valid
       if(await bcrypt.compare(req.body.password, user.password)){
-        User.changePassword(user, bcrypt.hash(req.body.new_password, 10));
+        const hash = await bcrypt.hash(req.body.new_password, 10);
+        await User.updateOne(
+          { _id: user._id },
+          { $set: { password: hash } },
+          { new: true }
+        );
         return res.status(200).json({
           message:'Password updated successfully',
         });
@@ -168,10 +173,6 @@ module.exports.resetPassword = async (req, res) => {
         message: 'new and confirm password doesn\'t match'
       })
     }
-    
-
-
-
   }catch(err){
     console.log(err.message);
     return res.status(422).json({
