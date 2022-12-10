@@ -7,8 +7,7 @@ const encryption = require('../config/encryption');
 
 // USER REGISTRATION - accepts Name, Email, Phone, Password and confirm password.
 module.exports.registerUser = async (req, res) => {
-
-
+  
   try{
 
     //validate if password and confirm password matches
@@ -23,7 +22,8 @@ module.exports.registerUser = async (req, res) => {
 
     //if user does not exist - create the user else redirect back to register page
     if(!user){
-      //encryping the user details before storing it into the database
+
+      //encryping the user details before storing it in DB
       const encryptedUser = {
         name: encryption.encryptData(req.body.name),
         email: req.body.email,
@@ -38,19 +38,18 @@ module.exports.registerUser = async (req, res) => {
     }else{
       //if user exists
       return res.status(422).json({
-        message: 'email already exists'
+        message: 'Email already exists.'
       });
     }
 
   }catch(err){
     if(err){
       console.log('registerUser:', err.message);
-      return res.status(422).json({
+      return res.status(500).json({
         message: 'Internal Server Error. Please try again!!'
       })
     }
   }
-  
   
 }
 
@@ -58,15 +57,12 @@ module.exports.registerUser = async (req, res) => {
 
 // USER LOGIN - accepts user email and password - upon login will generate a json web token valid for 5 mins
 module.exports.createSession = async (req, res) => {
-
   
   try{
 
     //find user using email - if user exists
-    
     let user = await User.findOne({ email: req.body.email});
     
-
     //if user doesnot exists
     if(!user){
       return res.status(422).json({
@@ -74,8 +70,7 @@ module.exports.createSession = async (req, res) => {
       })
     }
 
-    //check if password is valid
-    //console.log(await bcrypt.compare(req.body.password, user.password));
+    //check if password is valid - compare using bcrypt compare method
     if(await bcrypt.compare(req.body.password, user.password)){
       return res.status(200).json({
         message:'Sign in successfull',
@@ -83,6 +78,7 @@ module.exports.createSession = async (req, res) => {
           token: jwt.sign(user.toJSON(), process.env.JWT_SECRET, {expiresIn: '500000'})
         }
       });
+
     //return if invalid purpose
     }else{
       return res.status(422).json({
@@ -103,6 +99,8 @@ module.exports.createSession = async (req, res) => {
 module.exports.resetPassword = async (req, res) => {
   
   try{
+    
+    //checking if password and confirm passwords match
     if(req.body.new_password == req.body.confirm_password){
 
       //check if password is valid
@@ -113,6 +111,7 @@ module.exports.resetPassword = async (req, res) => {
           { $set: { password: hash } },
           { new: true }
         );
+
         return res.status(200).json({
           message:'Password updated successfully',
         });
@@ -124,16 +123,18 @@ module.exports.resetPassword = async (req, res) => {
         })
       }
 
-    }else{
+    }
+    //return if password and confirm password does not match
+    else{
       return res.status(422).json({
         message: 'new and confirm password doesn\'t match'
       })
     }
   }catch(err){
     console.log(err.message);
-    return res.status(422).json({
+    return res.status(500).json({
       message:'Internal server error'
-    })
+    });
 
   }
 
@@ -161,7 +162,7 @@ module.exports.updateUser = async (req, res) => {
 
     }catch(err){
       console.log('Error:', err.message);
-      return res.status(422).json({
+      return res.status(500).json({
         message: 'Internal Server Error'
       })
     }
@@ -173,6 +174,7 @@ module.exports.updateUser = async (req, res) => {
 // FETCH ALL USER 
 module.exports.getAllUsers = async (req, res) => {
   try{
+    //find all users present in DB and decrypt it
     let users = await User.find({});
     var decryptedUser = [];
     for(i in users){
@@ -193,7 +195,7 @@ module.exports.getAllUsers = async (req, res) => {
   }catch(err){
     if(err){
       console.log(err.message);
-      return res.status(422).json({
+      return res.status(500).json({
         message: `OOPs some error occurred - ${err.message}`
       });
     }
