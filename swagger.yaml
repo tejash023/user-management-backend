@@ -1,0 +1,180 @@
+openapi: 3.0.0
+info:
+  title: User Management
+  contact: {}
+  version: '1.0'
+servers:
+- url: https://user-management.up.railway.app/api/v1
+  variables: {}
+paths:
+  /register:
+    post:
+      tags:
+      - Auth
+      summary: User Registration
+      operationId: UserRegistration
+      parameters: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            encoding: {}
+            schema:
+              required:
+              - name
+              - email
+              - phone
+              - password
+              - confirm_password
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Nihar
+                email:
+                  type: string
+                  example: nihar@xyz.com
+                phone:
+                  type: integer
+                  format: int64
+                  example: 111111111111
+                password:
+                  type: integer
+                  format: int32
+                  example: 12345
+                confirm_password:
+                  type: integer
+                  format: int32
+                  example: 12345
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+  /login:
+    post:
+      tags:
+      - Auth
+      summary: User Login
+      operationId: UserLogin
+      parameters: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            encoding: {}
+            schema:
+              required:
+              - email
+              - password
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: nihar@xyz.com
+                password:
+                  type: integer
+                  format: int32
+                  example: 123
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+  /get:
+    get:
+      tags:
+      - User
+      summary: All Registered Users
+      operationId: AllRegisteredUsers
+      parameters: []
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security: []
+  /reset-password:
+    post:
+      tags:
+      - User
+      summary: Reset Password
+      operationId: ResetPassword
+      parameters: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            encoding: {}
+            schema:
+              required:
+              - password
+              - new_password
+              - confirm_password
+              type: object
+              properties:
+                password:
+                  type: integer
+                  format: int32
+                  example: 12345
+                new_password:
+                  type: integer
+                  format: int32
+                  example: 123
+                confirm_password:
+                  type: integer
+                  format: int32
+                  example: 123
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+  /update-user:
+    post:
+      tags:
+      - User
+      summary: Update User
+      operationId: UpdateUser
+      parameters: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            encoding: {}
+            schema:
+              required:
+              - name
+              - phone
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Nihar Ankit
+                phone:
+                  type: integer
+                  format: int64
+                  example: 7903464439
+        required: false
+      responses:
+        '200':
+          description: ''
+          headers: {}
+      deprecated: false
+      security:
+      - bearer: []
+components:
+  securitySchemes:
+    bearer:
+      type: http
+      scheme: bearer
+security: []
+tags:
+
+- name: Auth
+  description: ''
+- name: User
+  description: ''
