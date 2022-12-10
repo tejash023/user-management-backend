@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const port = process.env.PORT || '8080';
@@ -6,10 +7,11 @@ const passport = require('passport');
 const passportJWT = require('./config/passport-jwt-strategy');
 
 app.use(express.urlencoded({extended: false}));
-//routes
+
+// USER ROUTE
 app.use('/', require('./routes'));
 
-//starting the server
+// STARTING SERVER
 app.listen(port, function(err){
   if(err){
     console.log('Error starting in server', err.message);

@@ -1,11 +1,11 @@
 const crypto = require('crypto');
-const secret = 'appSecretKey';
-const rounds = 9921;
-const keySize = 32;
-const algorithm = 'aes-256-cbc';
+const secret = process.env.CRP_SECRET;
+const rounds = Number(process.env.CRP_ROUNDS);
+const keySize = Number(process.env.CRP_KEYSIZE);
+const algorithm = process.env.CRP_ALGO;
 const salt = crypto.createHash('sha1').update(secret).digest("hex");
 
-//encryption
+// ENCRYPTION
 module.exports.encryptData= (data) => {
   try {
     let iv = crypto.randomBytes(16);
@@ -20,7 +20,7 @@ module.exports.encryptData= (data) => {
   }
 }
 
-//decryption
+// DECRYPTION
 module.exports.decryptData = (encData) => {
   try {
     let textParts = encData.split(':');

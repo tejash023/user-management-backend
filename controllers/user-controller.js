@@ -1,16 +1,13 @@
 //importing user
 const User = require('../models/user');
-// const JwtStrategy = require('passport-jwt/lib/strategy');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const encryption = require('../config/encryption');
 
 
-//register the user
+// USER REGISTRATION - accepts Name, Email, Phone, Password and confirm password.
 module.exports.registerUser = async (req, res) => {
 
-  //accepts userName, userEmail, userPhone, password and confirm password.
-  //passowrd is stored in hashed format
 
   try{
 
@@ -29,9 +26,9 @@ module.exports.registerUser = async (req, res) => {
       //encryping the user details before storing it into the database
       const encryptedUser = {
         name: encryption.encryptData(req.body.name),
-        email: await req.body.email,
+        email: req.body.email,
         phone: encryption.encryptData(req.body.phone),
-        password: await bcrypt.hash(req.body.password, 10),
+        password: await bcrypt.hash(req.body.password, Number(process.env.BCR_SALT)),
       }
   
       await User.create(encryptedUser);
@@ -57,43 +54,12 @@ module.exports.registerUser = async (req, res) => {
   
 }
 
-//fetch all user 
-module.exports.getAllUsers = async (req, res) => {
-  try{
-    let users = await User.find({});
-    var decryptedUser = [];
-    for(i in users){
-      //console.log('user', users[i].name);
-      const user = {
-        name: encryption.decryptData(users[i].name),
-        email: users[i].email,
-        phone: encryption.decryptData(users[i].phone)
-      }
 
-      decryptedUser.push(user);
-    }
-    
-    return res.status(200).json({
-      message:'All registered users',
-      users: decryptedUser
-    });
 
-  }catch(err){
-    if(err){
-      console.log(err.message);
-      return res.status(422).json({
-        message: `OOPs some error occurred - ${err.message}`
-      });
-    }
-  }
-  
-}
-
-//user login
+// USER LOGIN - accepts user email and password - upon login will generate a json web token valid for 5 mins
 module.exports.createSession = async (req, res) => {
 
-  //accepts user email and password - upon login will generate a json web token valid for 5 mins
-
+  
   try{
 
     //find user using email - if user exists
@@ -114,7 +80,7 @@ module.exports.createSession = async (req, res) => {
       return res.status(200).json({
         message:'Sign in successfull',
         data:{
-          token: jwt.sign(user.toJSON(), 'faj42hrj2fejoihe2i3', {expiresIn: '500000'})
+          token: jwt.sign(user.toJSON(), process.env.JWT_SECRET, {expiresIn: '500000'})
         }
       });
     //return if invalid purpose
@@ -133,16 +99,15 @@ module.exports.createSession = async (req, res) => {
 }
 
 
-//reset password
+// RESET PASSWORD - accepts email, old password, new password and confirm password
 module.exports.resetPassword = async (req, res) => {
   
-  //accepts email, old password, new password and confirm password
   try{
     if(req.body.new_password == req.body.confirm_password){
 
       //check if password is valid
       if(await bcrypt.compare(req.body.password, req.user.password)){
-        const hash = await bcrypt.hash(req.body.new_password, 10);
+        const hash = await bcrypt.hash(req.body.new_password, Number(process.env.BCR_SALT));
         await User.updateOne(
           { _id: req.user._id },
           { $set: { password: hash } },
@@ -176,10 +141,8 @@ module.exports.resetPassword = async (req, res) => {
 }
 
 
-//update user details
+// UPDATE USER - accepts user name and user phone no and updates them.
 module.exports.updateUser = async (req, res) => {
-
-  //accepts user name and user phone no and updates them.
 
   if(req.user){
     try{
@@ -201,6 +164,38 @@ module.exports.updateUser = async (req, res) => {
       return res.status(422).json({
         message: 'Internal Server Error'
       })
+    }
+  }
+  
+}
+
+
+// FETCH ALL USER 
+module.exports.getAllUsers = async (req, res) => {
+  try{
+    let users = await User.find({});
+    var decryptedUser = [];
+    for(i in users){
+      const user = {
+        name: encryption.decryptData(users[i].name),
+        email: users[i].email,
+        phone: encryption.decryptData(users[i].phone)
+      }
+
+      decryptedUser.push(user);
+    }
+    
+    return res.status(200).json({
+      message:'All registered users',
+      users: decryptedUser
+    });
+
+  }catch(err){
+    if(err){
+      console.log(err.message);
+      return res.status(422).json({
+        message: `OOPs some error occurred - ${err.message}`
+      });
     }
   }
   
