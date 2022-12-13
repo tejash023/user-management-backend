@@ -1,4 +1,4 @@
-# User Management API
+# User Management Backend API
 A Server-side API built on NodeJS and MongoDB for User Management.
 
 [Live](https://user-management.up.railway.app/)
