@@ -12,19 +12,19 @@ info:
     - Display list of all users
     - All the users details are stored in database with encryption
 
-    [Github Link](https://github.com/tejash023/user-management-backend) 
-  contact: 
+    [Github Link](https://github.com/tejash023/user-management-backend)
+  contact:
     email: tejash34961@gmail.com
-  
-  version: '1.0'
+
+  version: "1.0"
 servers:
-- url: https://user-management-backend.up.railway.app/api/v1/user
-  variables: {}
+  - url: https://lavender-beetle-cuff.cyclic.app/api/v1/user
+    variables: {}
 paths:
   /register:
     post:
       tags:
-      - Auth
+        - Auth
       summary: User Registration
       operationId: UserRegistration
       parameters: []
@@ -34,11 +34,11 @@ paths:
             encoding: {}
             schema:
               required:
-              - name
-              - email
-              - phone
-              - password
-              - confirm_password
+                - name
+                - email
+                - phone
+                - password
+                - confirm_password
               type: object
               properties:
                 name:
@@ -61,15 +61,15 @@ paths:
                   example: 12345
         required: false
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           headers: {}
       deprecated: false
       security: []
   /login:
     post:
       tags:
-      - Auth
+        - Auth
       summary: User Login
       operationId: UserLogin
       parameters: []
@@ -79,8 +79,8 @@ paths:
             encoding: {}
             schema:
               required:
-              - email
-              - password
+                - email
+                - password
               type: object
               properties:
                 email:
@@ -92,28 +92,28 @@ paths:
                   example: 123
         required: false
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           headers: {}
       deprecated: false
       security: []
   /get:
     get:
       tags:
-      - User
+        - User
       summary: All Registered Users
       operationId: AllRegisteredUsers
       parameters: []
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           headers: {}
       deprecated: false
       security: []
   /reset-password:
     post:
       tags:
-      - User
+        - User
       summary: Reset Password
       operationId: ResetPassword
       parameters: []
@@ -123,9 +123,9 @@ paths:
             encoding: {}
             schema:
               required:
-              - password
-              - new_password
-              - confirm_password
+                - password
+                - new_password
+                - confirm_password
               type: object
               properties:
                 password:
@@ -142,16 +142,16 @@ paths:
                   example: 123
         required: false
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           headers: {}
       deprecated: false
       security:
-      - bearer: []
+        - bearer: []
   /update-user:
     post:
       tags:
-      - User
+        - User
       summary: Update User
       operationId: UpdateUser
       parameters: []
@@ -161,8 +161,8 @@ paths:
             encoding: {}
             schema:
               required:
-              - name
-              - phone
+                - name
+                - phone
               type: object
               properties:
                 name:
@@ -174,12 +174,12 @@ paths:
                   example: 7903464439
         required: false
       responses:
-        '200':
-          description: ''
+        "200":
+          description: ""
           headers: {}
       deprecated: false
       security:
-      - bearer: []
+        - bearer: []
 components:
   securitySchemes:
     bearer:
@@ -187,7 +187,7 @@ components:
       scheme: bearer
 security: []
 tags:
-- name: Auth
-  description: ''
-- name: User
-  description: ''
+  - name: Auth
+    description: ""
+  - name: User
+    description: ""
